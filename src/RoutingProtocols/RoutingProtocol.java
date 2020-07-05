@@ -54,7 +54,7 @@ public void ContactCounter(int i, int j){}
 
 public boolean expiredTTL_LargeSize(Node nx,Node ny, Packet packetObj)
 {
-	     boolean returnvalue=false;
+	     boolean returnvalue=true;
          // if packet's TTL expires remove it from the node's memory
 		 if(packetObj.isTTLExpired==true || packetObj.ispacketDelivered==true) {
 		   
@@ -75,15 +75,12 @@ public boolean expiredTTL_LargeSize(Node nx,Node ny, Packet packetObj)
 		 // and this packet is not transmitted in this slice
 		 if(packetObj.packetSize <= nx.capacity && 
 			!ny.packetIDHash.contains(packetObj.packetName) &&
-			packetObj.pathHops.get(1).equals(ny) &&
 		    packetObj.packetTransferedinSlice==false)
-			{/*
-				 * if (( ny!= packetObj.pathHops.get(packetObj.pathHops.size()-1) &
-				 * packetObj.packetSize <= ny.queueSizeLeft)||
-				 * (ny==packetObj.pathHops.get(packetObj.pathHops.size()-1)))
-				 */
-				 returnvalue=false;
-			
+			{
+			 if(packetObj.pathHops.size()>1) {
+				 if(packetObj.pathHops.get(1).equals(ny))
+				 {System.out.println("next hop:"+ packetObj.pathHops.get(1).name);
+					 returnvalue=false;}}
 		     } else returnvalue=true;
 		 return returnvalue;
 }
@@ -114,14 +111,13 @@ public void deliver_Destination(Node nx, Node ny, Packet packetObj)
             packetObj.ispacketDelivered=true;
             packetObj.pathHops.remove(0);
             //packetObj.packetTransferedinSlice=true;
-            //System.out.println(packetObj.packetName + " is delivered");
             
             //update nx memory 
      		nx.capacity -= packetObj.packetSize;
-     		nx.DestNPacket.remove(packetObj);
+     		//nx.DestNPacket.remove(packetObj);
             nx.queueSizeLeft+=packetObj.packetSize; // the whole space            
             nx.packetIDHash.remove(packetObj.packetName);
-            nx.packetCopies.remove(packetObj.packetName);
+            //nx.packetCopies.remove(packetObj.packetName);
             
 }
 
@@ -134,7 +130,8 @@ public void deliver_Relay(Node nx, Node ny, Node destNode, Packet packetObj, boo
 		  packetObj.packetReliability = (Math.min(packetObj.packetReliability, nx.reliability));
 		  packetObj.packetHops+=1; 
 		  packetObj.packetTransferedinSlice=true;
-		  packetObj.pathHops.remove(0);
+		  if(packetObj.pathHops.size()>1)
+		  {	packetObj.pathHops.remove(0);}
 		  
           // Give message to relay
           ny.DestNPacket.put(packetObj,destNode);
@@ -149,10 +146,10 @@ public void deliver_Relay(Node nx, Node ny, Node destNode, Packet packetObj, boo
    		  nx.capacity -= packetObj.packetSize;
    		  
    		  if(nx_remove_packet){
-   		  nx.DestNPacket.remove(packetObj);
+   		  //nx.DestNPacket.remove(packetObj);
           nx.queueSizeLeft+=packetObj.packetSize; // the whole space            
           //nx.packetIDHash.remove(packetObj.packetName);
-          nx.packetCopies.remove(packetObj.packetName);
+          //nx.packetCopies.remove(packetObj.packetName);
           
    		  }
 }

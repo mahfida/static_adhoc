@@ -69,7 +69,7 @@ public void GenerateFrame() {
         cspeed.add((speed+1)*10+""); // setting speed of the mobile node
 
    //Add radio ranges and queue sizes to their respective choice boxes
-   for(int l=1;l<15;l=l+2)
+   for(int l=1;l<=5;l=l+1)
     {
         cradiorange.add(l+"");//add Radio Range indices
         cqueuesize.add(l +"");
@@ -200,7 +200,7 @@ public void actionPerformed(ActionEvent e)
 		              node.name="S"+node.ID;
 		              node.speed=0;
 		              dtnrouting.Sources.add(node);
-		              node.setRadioRange(6);
+		              node.setRadioRange(4);
 		              node.wholeQueueSize=node.queueSizeLeft=500;
 		              dtnrouting.allNodes.add(node);
 		              node.nodePosition();
@@ -226,7 +226,7 @@ public void actionPerformed(ActionEvent e)
                 node.wholeQueueSize=node.queueSizeLeft=Integer.parseInt(cqueuesize.getSelectedItem());
                 dtnrouting.allNodes.add(node);
                 node.nodePosition();
-                }  
+                 }  
                 
                 // If from data sets
                 if(subcategory.equals("St.Andrew Uni")) 

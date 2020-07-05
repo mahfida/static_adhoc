@@ -82,21 +82,10 @@ public void CreateMessageAtSource() {
 				dtnrouting.source_index[s_counter++] = i;
 			else if(dtnrouting.allNodes.get(i).name.substring(0,1).equals("D"))
 				dtnrouting.dest_index[d_counter++] = i;
+			}
 			
-		    for(int j = i+1; j < dtnrouting.allNodes.size(); j++) 
-			{
-				Node ni = dtnrouting.allNodes.get(i);  //node i
-				Node nj = dtnrouting.allNodes.get(j);  // node j				
-				//If contact is present between nodes in current time stamp
-				dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i] = 0;
-				double capacity = pf.FindIntersection(ni, nj);
-				if(capacity>0.0) 
-				dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i] = (double)(1/capacity);
-				else 
-					dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i]=0;
-
-				//System.out.println(dtnrouting.adjacencyMatrix[i][j]+","+capacity+","+ni.reliability);
-			}}
+	    pf.FindNeighborhoods();
+			
 		
 	    // For last node
 	    dtnrouting.adjacencyMatrix[dtnrouting.allNodes.size()-1][dtnrouting.allNodes.size()-1]=0;
@@ -142,7 +131,7 @@ public void CreateMessageAtSource() {
         	
         	
         	destNode.num_packets =rand.nextInt(20)+1;
-        	destNode.packets_ttl =rand.nextInt(2000)+1000;
+        	destNode.packets_ttl =rand.nextInt(100)+50;
         	
         	//Below code generates packets for each destination
         	//stores the path a packet will take from the shortest path from its source to destination
@@ -156,7 +145,7 @@ public void CreateMessageAtSource() {
 
            	    // Source node of the destination
            	    Node sourceNode = dtnrouting.allNodes.get(source_id);
-           	    System.out.print("Packet "+ p.packetName+": path ");
+           	    //System.out.print("Packet "+ p.packetName+": path ");
            	    // Packet will follow the shortest path from source too destination
            	    for(int c=0; c < sourceNode.ptD.paths.get(d).size(); c ++) {
            	    	if(sourceNode.ptD.paths.get(d).get(c)==(-1)) {
@@ -164,9 +153,9 @@ public void CreateMessageAtSource() {
            	    	}
            	    	else {
            	    		p.pathHops.add(dtnrouting.allNodes.get(sourceNode.ptD.paths.get(d).get(c)));
-           	    		System.out.print(dtnrouting.allNodes.get(sourceNode.ptD.paths.get(d).get(c)).name+",");
+           	    		//System.out.print(dtnrouting.allNodes.get(sourceNode.ptD.paths.get(d).get(c)).name+",");
            	    	}}
-           	 System.out.println("");
+           	 
            	  // Store packet to inside source buffer
               if(dtnrouting.Sources.get(source_id).queueSizeLeft > p.packetSize)
                {    
@@ -174,8 +163,13 @@ public void CreateMessageAtSource() {
                     dtnrouting.Sources.get(source_id).packetIDHash.add(p.packetName); //Store ID of packet in the source as Hash value
                     //dtnrouting.Sources.get(source_id).packetTimeSlots.put(p.packetName,0);
                     dtnrouting.Sources.get(source_id).packetCopies.put(p.packetName,1);
+                    // these packets have no path
+                    if(p.pathHops.size()==0) {
+                    	dtnrouting.Sources.get(source_id).DestNPacket.put(p,null);
+                    	dtnrouting.Sources.get(source_id).number_packet_arrived+=1;}
+                    else
                     dtnrouting.Sources.get(source_id).DestNPacket.put(p,destNode);
-                    System.out.println("SOURCE: "+dtnrouting.Sources.get(source_id).name+", DEST: "+destNode.name);
+                    //System.out.println("SOURCE: "+dtnrouting.Sources.get(source_id).name+", DEST: "+destNode.name);
                     dtnrouting.sdpTA.append("\n "+dtnrouting.Sources.get(source_id).ID+"--"+destNode.ID+" ("+p.packetName+")");
                  }
               

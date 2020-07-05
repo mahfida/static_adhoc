@@ -24,6 +24,7 @@ public class PlayField extends RoutingProtocol
 
 	public PlayField() {}
 
+
 	//******************************************************************************
 	//DRAW NODES ALONG WITH THEIR packetS IN THE PLAYFIELD OF APPLET
 
@@ -49,18 +50,17 @@ public class PlayField extends RoutingProtocol
 
 
 			Ellipse2D e = new Ellipse2D.Double(n.nodeX, n.nodeY, r, r);
-			e.setFrame(n.nodeX, n.nodeY, r, r);
+			e.setFrame(n.nodeX - r, n.nodeY - r, 2*r, 2*r);
 			g2.draw(e);
+			//g.fillOval(n.nodeX - r,  n.nodeY - r, 2 * r, 2 * r);
 
 			//Put name of node inside node circle
 			g.setColor(Color.black);
-			g.drawString(n.ID+"", n.nodeX+(r)/2-5, n.nodeY+(r)/2+2);
+			g.drawString(n.ID+"", n.nodeX, n.nodeY);
 
 			//Show whether packet is present: for one packet only
 			if(!n.DestNPacket.isEmpty())
 			{
-				 //System.out.println("PLAY" + dtnrouting.delay);
-				//int b=n.DestNPacket.size();
 				Set<Packet> setPacket=n.DestNPacket.keySet();
 				Iterator<Packet> it=setPacket.iterator();
 				int x=n.nodeX+r/2-6;
@@ -75,7 +75,7 @@ public class PlayField extends RoutingProtocol
 					else
 						g.setColor(Color.BLUE);
 					//g.drawString(packetObj.packetName.substring(1)+",", x-40, y+15);
-					g.fillOval(x-40, y+15, 10, 10);
+					g.fillOval(x-40-5, y+15-5, 10, 10);
 
 					
 					//If node has more than one packet then next packet is displayed
@@ -97,25 +97,25 @@ public class PlayField extends RoutingProtocol
 
 		//******************************************************
 		//mid point and radius of ni
-		double x1 = (ni.nodeX + ni.nodeX + (ni.getRadioRange()))/2;
-		double y1 = (ni.nodeY + ni.nodeY + (ni.getRadioRange()))/2;
-		double r1 = (ni.getRadioRange())/2;
+		double x1 = ni.nodeX;
+		double y1 = ni.nodeY;
+		double r1 = ni.getRadioRange();//(ni.getRadioRange())/2;
 
 		//mid point and radius of nj
-		double x2 = (nj.nodeX + nj.nodeX + (nj.getRadioRange()))/2;
-		double y2 = (nj.nodeY + nj.nodeY + (nj.getRadioRange()))/2;
-		double r2 = (nj.getRadioRange())/2;
+		double x2 = nj.nodeX;
+		double y2 = nj.nodeY;
+		double r2 = nj.getRadioRange();//(nj.getRadioRange())/2;
 
 		double distance_km = Math.sqrt(Math.pow((y2-y1),2) + Math.pow((x2-x1),2));
 		double r = r1 + r2;
 
-		//System.out.print(distance_km+":"+r+"->");
+	
 		if(distance_km <= r) {
 			double dist_min = 1.5, dist_max = 6.4345, range_min = 0 , range_max = r;
 			distance_km = ((distance_km - range_min) / (range_max - range_min)) * (dist_max - dist_min) + dist_min;
 			return getLinkCapacity(distance_km);}
 	
-		else                  return 0.0;
+		else return 0.0;
 
 		//*********************************************************
 	}
@@ -150,6 +150,7 @@ public class PlayField extends RoutingProtocol
 	
 	public void FindNeighborhoods()
 	{
+		double capacity;
 		// Empty previous linked lists
 		for (int i = 0; i < dtnrouting.allNodes.size(); i++) {
 			dtnrouting.allNodes.get(i).link_capacity.clear();
@@ -161,7 +162,7 @@ public class PlayField extends RoutingProtocol
 		// Generate n1 and n2_neiborhood
 		for (int i = 0; i < (dtnrouting.allNodes.size()-1); i++) {
 			dtnrouting.adjacencyMatrix[i][i]=0;
-		
+		    //System.out.print("\nNode ("+(i+1)+"): ");
 			for(int j = i+1; j < dtnrouting.allNodes.size(); j++) 
 				{
 					Node ni = dtnrouting.allNodes.get(i);  //node i
@@ -169,23 +170,23 @@ public class PlayField extends RoutingProtocol
 					//If contact is present between nodes in current time stamp
 					
 					dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i] = 0;
-					double capacity = FindIntersection(ni, nj);
-					dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i] = (0.5)*(1/capacity) + (0.5)*1/ni.msg_relibility;
-					
+					capacity = FindIntersection(ni, nj);	
 					// If two nodes are neighbor, then update the neighborhood information
 					if(capacity > 0.0)
 					{
+						dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i] = (double)(1/capacity);
 						dtnrouting.contactsTA.insert(ni.ID+"<-->"+nj.ID+"\n", 0);
 						// when new nodes comes into contact then deliver the message
 						ni.link_capacity.add(capacity);
 						nj.link_capacity.add(capacity);
-						
+						//System.out.print("-"+(j+1));
 						ni.n1_neighborhood.add(j);
 						nj.n1_neighborhood.add(i);
 						
 						ni.n2_neighborhood.add(j);
 						nj.n2_neighborhood.add(i);
-					}}
+					}else 
+					dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i]=0;}
 		}
 		dtnrouting.adjacencyMatrix[dtnrouting.allNodes.size()-1][dtnrouting.allNodes.size()-1]=0;
 		
@@ -217,22 +218,21 @@ public class PlayField extends RoutingProtocol
 			}				
 	
 
-	}// Find neighbor hood ended
-
+}// Find neighbor hood ended
+	
 //******************************************************************************
 
 public void TransferPackets()
 {
-	    for (int i = 0; i < dtnrouting.allNodes.size(); i++) {
-		Node ni = dtnrouting.allNodes.get(i);
+	//
+       System.out.println("Time before:"+dtnrouting.delay);
+	    for (int a = 0; a < dtnrouting.allNodes.size(); a++) {
+		Node ni = dtnrouting.allNodes.get(a);
+		
+		
 		int relay_packets = ni.DestNPacket.size()-ni.number_packet_arrived;
-		// If ni has relay packet to send
 		if(relay_packets > 0) {
-			
-		//Coloring or slot allocation by looking at ni's n2 neighbors
 		ni.time_slot =  (double)(1.0/(ni.n2_neighborhood.size()+1.0)); // time_slot is all time
-		//System.out.println(ni.n2_neighborhood.size());
-		//System.out.println(ni.time_slot);
 		
 		// See which n2 nodes have no data to transmit
 		// and see how much data, transmitting node have
@@ -242,47 +242,45 @@ public void TransferPackets()
 			int data_size = dtnrouting.allNodes.get(ni.n2_neighborhood.get(k)).DestNPacket.size()-
 							dtnrouting.allNodes.get(ni.n2_neighborhood.get(k)).number_packet_arrived;
 			if(data_size ==0) silent_nodes +=1;
-			else all_packets+= data_size;		
-		}
+			else all_packets+= data_size;}
 		 
 		// Total time slots given to node ni
 		// Its own time slot plus portion of time slots of the silent nodes
 		ni.time_slot  = ni.time_slot + ni.time_slot *( relay_packets* silent_nodes)/all_packets;
 		
-		// Update the time_slot of ni, according to above information
-		for(int k =0; k <  ni.n1_neighborhood.size(); k++) {
+	    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
 			// Available capacity for link with k n1_neighbor
-			ni.capacity= (double)(ni.link_capacity.get(k)*ni.time_slot);
-			//System.out.println("total capacity"+ni.link_capacity.get(k)+", Initial capacity:"+ni.capacity);
-			if(!dtnrouting.allNodes.get(ni.n1_neighborhood.get(k)).name.contains("S"))
-			DeliverData(ni, dtnrouting.allNodes.get(ni.n1_neighborhood.get(k)));
-		}}
+			ni.capacity= (double)(ni.link_capacity.get(p)*ni.time_slot);
+			if((!dtnrouting.allNodes.get(ni.n1_neighborhood.get(p)).name.contains("S")
+			  & dtnrouting.allNodes.get(ni.n1_neighborhood.get(p)).queueSizeLeft>0) ||
+			 (ni.DestNPacket.containsValue(ni.n1_neighborhood.get(p)))){
+	          DeliverData(ni, dtnrouting.allNodes.get(ni.n1_neighborhood.get(p)));}}
 		 
 	    }
-	   
+	    }
 	    // After packets are transfered in the slice 
 	    //toggle their packetTransfered to false for next slice
-	    for(int i=0; i< dtnrouting.arePacketsDelivered.size(); i++)
-	    	dtnrouting.arePacketsDelivered.get(i).packetTransferedinSlice=false;
-	    
+	    for(int d=0; d< dtnrouting.arePacketsDelivered.size(); d++)
+	    	dtnrouting.arePacketsDelivered.get(d).packetTransferedinSlice=false;
+	    System.out.println("Time after"+dtnrouting.delay);
 	    
 }
 
 public void DeliverData(Node nx, Node ny)
 {
+	   ArrayList<Packet> dummyDestNPacket = new ArrayList<Packet>();
 		//Transfer the packets
 	    for (Iterator<Map.Entry<Packet,Node>> i = nx.DestNPacket.entrySet().iterator(); i.hasNext(); )
 	     {
 	             Map.Entry<Packet,Node> entry = i.next();
 	             Packet packetObj = entry.getKey();
 	             Node   destNode = entry.getValue();
-	            
-	             //System.out.println("Delay:"+dtnrouting.delay+" -Capacity of "+nx.name+" is: ("+ nx.capacity+")");
 
-	             if(packetObj.packetSize >= nx.capacity) {
-	            	//System.out.println(ny.name+ " has no size");
-	            	break;
-	            }
+	             if((packetObj.packetSize >= nx.capacity) ||
+	              (ny.queueSizeLeft == 0 & ny.name.contains("R"))) 
+	              break;
+	            
+	             
 	            //If destination has not enough size to receive packet
 	            //OR if the next destination of packet is not ny
 	            //OR if its TTL is expired,  it packet cannot be sent
@@ -297,19 +295,27 @@ public void DeliverData(Node nx, Node ny)
 	                    //if ny is destination
 	                    if(destNode.equals(ny))
 	                    {	deliver_Destination(nx, ny, packetObj);
-	                    System.out.println(packetObj.packetName+":"+nx.name+"->"+ny.name+" ("+destNode.name+")");
-		                 
+	                    	System.out.println(packetObj.packetName+":"+nx.name+"->"+ny.name+" ("+destNode.name+")");
+	                    	dummyDestNPacket.add(packetObj);
 	                    }
 	                    //if ny is not a destination
 	                    else if(packetObj.packetSize <= ny.queueSizeLeft)
-	                    { deliver_Relay(nx, ny,destNode, packetObj,true);
-	                    System.out.print(packetObj.packetName+":"+nx.name+"->"+ny.name+" ("+destNode.name+"), hops: "+packetObj.pathHops.size());
-	                    System.out.println(", Capacity: "+nx.capacity+", relay bufferspace "+ny.queueSizeLeft+", time unit("+dtnrouting.delay+")");
-		                   
-	                    }
+	                    { 
+	                    	deliver_Relay(nx, ny,destNode, packetObj,true);
+	                    	System.out.println(packetObj.packetName+":"+nx.name+"->"+ny.name+" ("+destNode.name+")");
+	                    	dummyDestNPacket.add(packetObj);   
+	                    } 
+						/*
+						 * else {
+						 * System.out.println("No spcae, packet size:"+packetObj.packetSize+", Qsize:"
+						 * +ny.queueSizeLeft); }
+						 */
+	                    
 	                 }
 
 	}
+	    for(int i=0 ; i< dummyDestNPacket.size(); i++ )
+	    nx.DestNPacket.remove(dummyDestNPacket.get(i));
 }
 
 

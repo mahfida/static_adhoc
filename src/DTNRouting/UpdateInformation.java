@@ -15,7 +15,6 @@ import java.util.Random;
 
 
 
-import AdapterPackage.MyActionAdapter;
 
 //******************************************************************************
 // CLASS MADE FOR UPDATING THE INFORMATION DURING SIMULATION
@@ -52,7 +51,8 @@ public void UpdateTTLandLatency()
           if(packetObj.packetTTL==0){
           //if packet's TTL expires, it cannot be delivered else if
             packetObj.isTTLExpired=true;
-            //System.out.println(packetObj.packetName + " is expired");
+           // System.out.println("Expired: "+dtnrouting.delay);
+           //System.out.println(packetObj.packetName + " is expired");
             dtnrouting.NumPacketsDeliverExpired += 1;}}
       }
       
@@ -94,8 +94,9 @@ public void UpdateTTLandLatency()
 			  df2.format(dtnrouting.Destinations.get(h).msg_dl)+  ", " +
 			  df2.format(expired/dtnrouting.Destinations.get(h).nodePackets.size())+  ", " +
 			  df2.format(dtnrouting.Destinations.get(h).msg_relibility)+"\n");
-	  	    dtnrouting.deliveryTA.append(dtnrouting.Destinations.get(h).name+", dl: "+dtnrouting.Destinations.get(h).msg_dl+"\n");
-	  	      }
+	  	      dtnrouting.deliveryTA.append("\n"+dtnrouting.Destinations.get(h).name+", dl: "+dtnrouting.Destinations.get(h).msg_dl);
+	  	   
+	      }
 	      
 	      
 	         

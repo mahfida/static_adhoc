@@ -259,17 +259,32 @@ public void start ()
 //define the code that constitutes the new thread
 public void run()
 {
-        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         while (true) {
         if(SIMULATION_RUNNING==true)
-            try { updateInformation.nextPositionForMovement(); } 
+            try { updateInformation.nextPositionForMovement(); 
+            } 
             catch (IOException ex) { Logger.getLogger(dtnrouting.class.getName()).log(Level.SEVERE, null, ex); }
             repaint();
 
-                        try
-                        { Thread.sleep(0,500); }
-                        catch (InterruptedException ex) { }
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+             try{ 
+                        	Thread.sleep(1000);
+             }catch (InterruptedException ex) { }
+             
+             // Run the simulation network
+             if(SIMULATION_RUNNING) 
+             {
+          	     updateInformation.UpdateTTLandLatency();
+                 //Call transfer function to deliver messages in each time unit
+                 if(!dtnrouting.THIS_SIMULATION_ENDED)
+                 playField.TransferPackets();
+                 //Stores the time units elapsed in the simulation environment
+                 simulationTime+=1;
+             }
+             if(THIS_SIMULATION_ENDED==true)
+                 updateInformation.simulationSettings(this);
+             
+
         }
 }
 
@@ -306,35 +321,8 @@ public void animation(Graphics g)
        g.fillRect(0, 0, this.getWidth(), this.getHeight());
        g.setColor(Color.RED);
        g2.drawRect(x_start, y_start, width, height);
-      
+       playField.drawNodesPackets(g);
 
-       //Until destination does not get packet the transfer of message carries on
-       if(THIS_SIMULATION_ENDED==true)
-         updateInformation.simulationSettings(this);
-     
-       if(SIMULATION_RUNNING) 
-       {
-    	   //System.out.println("dtn: "+delay);
-    	   //for drawing nodes and the packets that they hold
-           playField.drawNodesPackets(g);
-           // Following code will be called once, only in beginning,
-           // if nodes are static
-           if(delay ==0 && allNodes.get(allNodes.size()-1).speed==0)
-        	   playField.FindNeighborhoods();
-           
-           else if(allNodes.get(allNodes.size()-1).speed>0)
-        	   playField.FindNeighborhoods();
-           
-           // Update the TTL field of all packets along with latency of the packet
-           updateInformation.UpdateTTLandLatency();
-           
-
-           //Call transfer function to deliver messages in each time unit
-            playField.TransferPackets();
-           
-           //Stores the time units elapsed in the simulation environment
-           simulationTime+=1;
-       }
 }
 
 //******************************************************************************

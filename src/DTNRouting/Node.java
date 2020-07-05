@@ -51,10 +51,10 @@ public  Node() {
 public void nodePosition() {
 	// Each node will have a limited movement area within the simulation area (playfield)
 	node_nm = new NodeMovement();
-	this.topleft_xcorner = rand.nextInt(dtnrouting.width-this.getRadioRange()/2-(int)dtnrouting.width/4) + dtnrouting.x_start;
-	this.topleft_ycorner = rand.nextInt(dtnrouting.height-this.getRadioRange()/2-(int)dtnrouting.height/4) + dtnrouting.y_start;
-	this.xwidth =  dtnrouting.width/4;
-	this.yheight = dtnrouting.height/4;
+	this.topleft_xcorner = dtnrouting.x_start+this.getRadioRange();// + rand.nextInt(dtnrouting.width-this.getRadioRange()/2-(int)dtnrouting.width/4);
+	this.topleft_ycorner = dtnrouting.y_start+this.getRadioRange();// + rand.nextInt(dtnrouting.height-this.getRadioRange()/2-(int)dtnrouting.height/4);
+	this.xwidth =  dtnrouting.width-2*this.getRadioRange();///4;
+	this.yheight = dtnrouting.height-2*this.getRadioRange();///4;
 	node_nm.InitialNodePositions(this);
 	
 	this.reliability = rand.nextInt(4)+1;
