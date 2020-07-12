@@ -59,7 +59,7 @@ public boolean expiredTTL_LargeSize(Node nx,Node ny, Packet packetObj)
 		 if(packetObj.isTTLExpired==true || packetObj.ispacketDelivered==true) {
 		   
 		   if(packetObj.packetTTL==0 & nx.queueSizeLeft==0) {
-		   System.out.println(packetObj.packetName+ " is expired and upddate node "+ nx.name);
+		  // System.out.println(packetObj.packetName+ " is expired and upddate node "+ nx.name);
 		   nx.queueSizeLeft+=packetObj.packetSize;} // the whole space}
 		   
 		   nx.packetIDHash.remove(packetObj.packetName);
@@ -73,15 +73,17 @@ public boolean expiredTTL_LargeSize(Node nx,Node ny, Packet packetObj)
 		 // and ny does not contain the packet
 		 // and ny is in the path towards destination
 		 // and this packet is not transmitted in this slice
-		 if(packetObj.packetSize <= nx.capacity && 
+		 else if(packetObj.packetSize <= nx.capacity && 
 			!ny.packetIDHash.contains(packetObj.packetName) &&
 		    packetObj.packetTransferedinSlice==false)
 			{
 			 if(packetObj.pathHops.size()>1) {
 				 if(packetObj.pathHops.get(1).equals(ny))
-				 {System.out.println("next hop:"+ packetObj.pathHops.get(1).name);
+				 {//System.out.println("next hop:"+ packetObj.pathHops.get(1).name);
 					 returnvalue=false;}}
-		     } else returnvalue=true;
+		     } 
+		 
+		 else returnvalue=true;
 		 return returnvalue;
 }
 
@@ -100,12 +102,10 @@ public void deliver_Destination(Node nx, Node ny, Packet packetObj)
             ny.DestNPacket.put(packetObj,null);
             ny.number_packet_arrived+=1;
             ny.packetIDHash.add(packetObj.packetName);
-            //ny.packetTimeSlots.put(packetObj.packetName, 0);
             ny.packetCopies.put(packetObj.packetName,1);
-            //ny.queueSizeLeft-=packetObj.packetSize;
-            dtnrouting.deliveryTA.append("\n"+nx.ID+"-->"+ny.ID+":"+packetObj.packetName+"("+dtnrouting.delay+")");
+            dtnrouting.deliveryTA.append("\n"+nx.ID+"-->"+ny.ID+":"+packetObj.packetName+"("+dtnrouting.timer+")");
             
-            dtnrouting.NumPacketsDeliverExpired+=1;
+            dtnrouting.total_packetsDeliveredExpired+=1;
             
             // packet delivered and transfered in this slice
             packetObj.ispacketDelivered=true;
@@ -114,10 +114,8 @@ public void deliver_Destination(Node nx, Node ny, Packet packetObj)
             
             //update nx memory 
      		nx.capacity -= packetObj.packetSize;
-     		//nx.DestNPacket.remove(packetObj);
             nx.queueSizeLeft+=packetObj.packetSize; // the whole space            
             nx.packetIDHash.remove(packetObj.packetName);
-            //nx.packetCopies.remove(packetObj.packetName);
             
 }
 
@@ -139,19 +137,15 @@ public void deliver_Relay(Node nx, Node ny, Node destNode, Packet packetObj, boo
           //ny.packetTimeSlots.put(packetObj.packetName, 0);
           ny.packetCopies.put(packetObj.packetName,1);
           ny.queueSizeLeft-=packetObj.packetSize;
-          dtnrouting.transferTA.append("\n"+nx.ID+"-->"+ny.ID+":"+packetObj.packetName+"("+dtnrouting.delay+")");
+          dtnrouting.transferTA.append("\n"+nx.ID+"-->"+ny.ID+":"+packetObj.packetName+"("+dtnrouting.timer+")");
           
           
           //update nx memory 
    		  nx.capacity -= packetObj.packetSize;
    		  
-   		  if(nx_remove_packet){
-   		  //nx.DestNPacket.remove(packetObj);
+   		  if(nx_remove_packet)
           nx.queueSizeLeft+=packetObj.packetSize; // the whole space            
-          //nx.packetIDHash.remove(packetObj.packetName);
-          //nx.packetCopies.remove(packetObj.packetName);
-          
-   		  }
+
 }
 
 }// End of class

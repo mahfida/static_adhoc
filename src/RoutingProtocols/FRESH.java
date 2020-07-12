@@ -43,7 +43,7 @@ public void setPerimeters()
 
 public void updateLastEncounterTime(int x,int y)
 {
-    LastEncounterTime[y][x]=LastEncounterTime[y][x]=dtnrouting.simulationTime;
+    LastEncounterTime[y][x]=LastEncounterTime[y][x]=dtnrouting.timer;
 }
 
 //******************************************************************************
@@ -61,7 +61,7 @@ public void DeliverData(Node nx,Node ny)    //x and y are intermediate sender an
                 packetObj.packetTTL=packetObj.maxTTL;
                 packetObj.packetLatency=0;
             }
-          dtnrouting.delay=0;
+          dtnrouting.timer=0;
       }
       warmFlag=true;
       

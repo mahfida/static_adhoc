@@ -64,7 +64,7 @@ public void DeliverData(Node nx,Node ny)
             packetObj.packetLatency=0;
         }
           dtnrouting.sdpTA.append(" FINISHED\n");
-          dtnrouting.delay=0;
+          dtnrouting.timer=0;
       }
       warmFlag=true;
    
@@ -105,7 +105,7 @@ public void DeliverData(Node nx,Node ny)
                 case 1:
                    //deliver packet to destination
                    deliver_Destination(nx, ny, packetObj);
-                   packetObj.packetLatency=dtnrouting.delay;
+                   packetObj.packetLatency=(int)dtnrouting.timer;
                    
                    break;
                

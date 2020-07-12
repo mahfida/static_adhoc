@@ -120,7 +120,7 @@ public void DeliverData(Node nx,Node ny)
                 packetObj.packetTTL=packetObj.maxTTL;
                 packetObj.packetLatency=0;
             }
-          dtnrouting.delay=0;
+          dtnrouting.timer=0;
       }
       warmFlag=true;
    

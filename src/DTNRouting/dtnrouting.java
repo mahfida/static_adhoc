@@ -28,21 +28,22 @@ public class dtnrouting extends Applet implements Runnable
 	private static final long serialVersionUID = 1L;
 	// VARIABLES USED THROUGHOUT THE SIMULATION
     //public int i, radio;
-    public static long simulationTime = 0;
+    public static long timer = 0;
     //  source and destination indices declare static and other parameters are initially 0
-    public static int dataset_simulation_index=0, delay=0, appletWidth, appletHeight;
+    public static int dataset_simulation_index=0,appletWidth, appletHeight;
     // dimensions of applet parameters
     public static int width, height, x_start, y_start, first_regular_node_index=0;
     
     // PERFORMANCE METTRICS
     // After multiple simulation averaging the results of the three metrics
     public static int latency_avg=0, load_avg=0, bandwidth_avg=0, packetCounter=0, DR_avg=0, nodecount=0;
-    public static int source_index[] , dest_index[];
+    public static int source_index[] , dest_index[], uav_index[];
+    public static int destsourcePair[];
     // Variables related to movement speeds
     //public static boolean random_movement=false, x_reached=false, y_reached=false;
     public static boolean isdelivered=false, THIS_SIMULATION_ENDED=false, SIMULATION_RUNNING=false;
     public static String  movementtype="Random", protocolName="";
-    public static int     NumPacketsDeliverExpired=0, nodeNumber=-1, SIMULATION_N0=1, TOTAL_SIMULATION_RUNS=1;
+    public static int     total_packetsDeliveredExpired=0, SIMULATION_PART=1, SIMULATION_N0=1, TOTAL_SIMULATION_RUNS=1;
 	public static double [][] adjacencyMatrix;
     //******************************************************************************
     //DIFFERENT OBJECTS
@@ -69,7 +70,7 @@ public class dtnrouting extends Applet implements Runnable
 
 //Menus and menu items in menu bar jmb
     JButton nodeMenu=new JButton("Node");
-    JButton packetMenu=new JButton("Packet");
+    JButton packetMenu=new JButton("QoIT Path");
 
 //Node Movement Models
     JMenu nm_model=new JMenu("Movement Model");
@@ -261,7 +262,7 @@ public void run()
 {
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         while (true) {
-        if(SIMULATION_RUNNING==true)
+            if(SIMULATION_RUNNING)
             try { updateInformation.nextPositionForMovement(); 
             } 
             catch (IOException ex) { Logger.getLogger(dtnrouting.class.getName()).log(Level.SEVERE, null, ex); }
@@ -278,10 +279,8 @@ public void run()
                  //Call transfer function to deliver messages in each time unit
                  if(!dtnrouting.THIS_SIMULATION_ENDED)
                  playField.TransferPackets();
-                 //Stores the time units elapsed in the simulation environment
-                 simulationTime+=1;
              }
-             if(THIS_SIMULATION_ENDED==true)
+             if(THIS_SIMULATION_ENDED)
                  updateInformation.simulationSettings(this);
              
 

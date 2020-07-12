@@ -66,8 +66,8 @@ public void updateAICDuration(int m,int n)
     noOfEncounters[n][m]=noOfEncounters[m][n]=noOfEncounters[m][n]+1;
     
     //Update encounter duration
-    encounterDuration[n][m]=encounterDuration[m][n]= dtnrouting.simulationTime- lastEncounterTime[m][n];
-    lastEncounterTime[n][m]=lastEncounterTime[m][n]=dtnrouting.simulationTime;
+    encounterDuration[n][m]=encounterDuration[m][n]= dtnrouting.timer- lastEncounterTime[m][n];
+    lastEncounterTime[n][m]=lastEncounterTime[m][n]=dtnrouting.timer;
     //If this is first
     if(CAoICDuration[m][n]==-1) CAoICDuration[n][m]=CAoICDuration[m][n]=0;
     //Update mutual interContactDuration
@@ -85,12 +85,12 @@ int m=nx.ID-1; int n=ny.ID-1;
 
 if(encounterPeriod[m][n]==-1)
 {
-    encounterPeriod[n][m]=encounterPeriod[m][n]=dtnrouting.simulationTime;
+    encounterPeriod[n][m]=encounterPeriod[m][n]=dtnrouting.timer;
     firstEncounterPosition[m][n][0]=nx.nodeX;
     firstEncounterPosition[m][n][1]=nx.nodeY;
     firstEncounterPosition[m][n][2]=ny.nodeX;
     firstEncounterPosition[m][n][3]=ny.nodeY;
-    lastPeriodStartTime[n][m]=lastPeriodStartTime[m][n]=dtnrouting.simulationTime;
+    lastPeriodStartTime[n][m]=lastPeriodStartTime[m][n]=dtnrouting.timer;
   
 }
 //Total period
@@ -99,8 +99,8 @@ else if(firstEncounterPosition[m][n][0]==nx.nodeX &&
      firstEncounterPosition[m][n][2]==ny.nodeX &&
      firstEncounterPosition[m][n][3]==ny.nodeY)
   {
-   encounterPeriod[n][m]= encounterPeriod[m][n]=dtnrouting.simulationTime-encounterPeriod[m][n];
-   lastPeriodStartTime[n][m]=lastPeriodStartTime[m][n]=dtnrouting.simulationTime;
+   encounterPeriod[n][m]= encounterPeriod[m][n]=dtnrouting.timer-encounterPeriod[m][n];
+   lastPeriodStartTime[n][m]=lastPeriodStartTime[m][n]=dtnrouting.timer;
   }
 
 
@@ -112,8 +112,8 @@ else if(firstEncounterPosition[m][n][0]==nx.nodeX &&
  public void minExpectedDelay(Node nx,Node ny,Node destNode ){
 //Time left for node x to encounter destination node
 int i=nx.ID-1,j=ny.ID-1,k=destNode.ID-1;
-long timex=(dtnrouting.simulationTime-lastPeriodStartTime[i][k])%((long)CAoICDuration[i][k]);
-long timey=(dtnrouting.simulationTime-lastPeriodStartTime[j][k])%((long)CAoICDuration[j][k]);
+long timex=(dtnrouting.timer-lastPeriodStartTime[i][k])%((long)CAoICDuration[i][k]);
+long timey=(dtnrouting.timer-lastPeriodStartTime[j][k])%((long)CAoICDuration[j][k]);
 if(timex==0)
 timeLeftNx=0;
 else
@@ -146,7 +146,7 @@ public void DeliverData(Node nx,Node ny)    //x and y are intermediate sender an
                 packetObj.packetTTL=packetObj.maxTTL;
                 packetObj.packetLatency=0;
             }
-          dtnrouting.delay=0;
+          dtnrouting.timer=0;
       }
       warmFlag=true;
    

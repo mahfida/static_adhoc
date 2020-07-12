@@ -33,10 +33,11 @@ public void actionPerformed (ActionEvent ae)
  buttonname=ae.getActionCommand();
  
 // CREATE PACKET 
- if(buttonname.equals("Packet"))
+ if(buttonname.equals("QoIT Path"))
  {
-         CreatePacket packetObj=new CreatePacket();
-         packetObj.CreateMessageAtSource();
+	     QoITPATH pathObj=new QoITPATH();
+         pathObj.ShortestPathsSD();
+         pathObj.SetSource();
  }
     
 // MOBILITY PATTERN
@@ -66,7 +67,7 @@ public void actionPerformed (ActionEvent ae)
   else if(buttonname.equals("Run"))
   {
    // SET THE SIMULATION DELAY
-   dtnrouting.delay=0;
+   dtnrouting.timer=0;
    dtnrouting.SIMULATION_RUNNING=true;
   }
  

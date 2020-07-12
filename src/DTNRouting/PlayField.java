@@ -47,7 +47,7 @@ public class PlayField extends RoutingProtocol
 			if(n.name.substring(0,1).equals("R"))         g2.setPaint(Color.YELLOW);
 			else if(n.name.substring(0, 1).equals("D"))   g2.setPaint(Color.BLUE);
 			else if(n.name.substring(0, 1).equals("S"))   g2.setPaint(Color.RED);
-
+			else if(n.name.substring(0, 1).equals("U"))   g2.setPaint(Color.GRAY);
 
 			Ellipse2D e = new Ellipse2D.Double(n.nodeX, n.nodeY, r, r);
 			e.setFrame(n.nodeX - r, n.nodeY - r, 2*r, 2*r);
@@ -110,9 +110,10 @@ public class PlayField extends RoutingProtocol
 		double r = r1 + r2;
 
 	
-		if(distance_km <= r) {
+		if(distance_km <= r) { 
 			double dist_min = 1.5, dist_max = 6.4345, range_min = 0 , range_max = r;
 			distance_km = ((distance_km - range_min) / (range_max - range_min)) * (dist_max - dist_min) + dist_min;
+			//System.out.println(distance_km+ "/"+ getLinkCapacity(distance_km));
 			return getLinkCapacity(distance_km);}
 	
 		else return 0.0;
@@ -125,7 +126,8 @@ public class PlayField extends RoutingProtocol
 		/* Random rand = new Random();
 		double mean_dB = 0.0, sd_dB = 1.0, RandomFading_dB = rand.nextGaussian()*sd_dB + mean_dB;*/
 		double Beta = 4.0, thisRate = 0.0, freq_Mhz = 2400;
-		double[] rates = {0.0, 7.2, 14.4, 21.7, 28.9, 43.3, 57.8, 65.0, 72.2};
+		//double[] rates = {0.0, 7.2, 14.4, 21.7, 28.9, 43.3, 57.8, 65.0, 72.2};
+		double[] rates = {3.0, 7.2, 14.4, 21.7, 28.9, 43.3, 57.8, 65.0, 72.2};
 		double[] snrThreshold = {0.0, 2.0, 5.0, 9.0, 11.0, 15.0, 18.0, 20.0, 25.0}; 
 
 		/*if (RandomFading_dB < 0.0) 
@@ -224,8 +226,7 @@ public class PlayField extends RoutingProtocol
 
 public void TransferPackets()
 {
-	//
-       System.out.println("Time before:"+dtnrouting.delay);
+	
 	    for (int a = 0; a < dtnrouting.allNodes.size(); a++) {
 		Node ni = dtnrouting.allNodes.get(a);
 		
@@ -251,24 +252,27 @@ public void TransferPackets()
 	    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
 			// Available capacity for link with k n1_neighbor
 			ni.capacity= (double)(ni.link_capacity.get(p)*ni.time_slot);
-			if((!dtnrouting.allNodes.get(ni.n1_neighborhood.get(p)).name.contains("S")
-			  & dtnrouting.allNodes.get(ni.n1_neighborhood.get(p)).queueSizeLeft>0) ||
-			 (ni.DestNPacket.containsValue(ni.n1_neighborhood.get(p)))){
-	          DeliverData(ni, dtnrouting.allNodes.get(ni.n1_neighborhood.get(p)));}}
-		 
-	    }
-	    }
+			Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
+			
+			if((!nj.name.contains("S") & nj.queueSizeLeft > 0) ||
+			  (ni.DestNPacket.containsValue(nj)))
+			{ System.out.println(ni.name+"..."+nj.name+", capacity:"+ni.capacity);
+	          DeliverData(ni, nj);}
+			}}}
+	    
+	    
 	    // After packets are transfered in the slice 
 	    //toggle their packetTransfered to false for next slice
 	    for(int d=0; d< dtnrouting.arePacketsDelivered.size(); d++)
 	    	dtnrouting.arePacketsDelivered.get(d).packetTransferedinSlice=false;
-	    System.out.println("Time after"+dtnrouting.delay);
-	    
-}
+	   
+} //End of Method
+// ********************************************************************************
 
 public void DeliverData(Node nx, Node ny)
 {
-	   ArrayList<Packet> dummyDestNPacket = new ArrayList<Packet>();
+	
+	    ArrayList<Packet> dummyDestNPacket = new ArrayList<Packet>();
 		//Transfer the packets
 	    for (Iterator<Map.Entry<Packet,Node>> i = nx.DestNPacket.entrySet().iterator(); i.hasNext(); )
 	     {
@@ -305,9 +309,10 @@ public void DeliverData(Node nx, Node ny)
 	                    	System.out.println(packetObj.packetName+":"+nx.name+"->"+ny.name+" ("+destNode.name+")");
 	                    	dummyDestNPacket.add(packetObj);   
 	                    } 
-						/*
+						
+	                     /*
 						 * else {
-						 * System.out.println("No spcae, packet size:"+packetObj.packetSize+", Qsize:"
+						 * System.out.println("No space, packet size:"+packetObj.packetSize+", Qsize:"
 						 * +ny.queueSizeLeft); }
 						 */
 	                    

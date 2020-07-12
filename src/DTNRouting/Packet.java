@@ -19,8 +19,8 @@ public class Packet implements ActionListener
     public Node sourceNode=new Node(); //source node of the packet
     public int packetTTL,maxTTL;
     // Features used to assess network transmission quality
-    public int packetSize,packetLoad=1,packetHops=0,packetLatency=0;
-    public double packetReliability=4;
+    public int packetLoad=1,packetHops=0,packetLatency=0;
+    public double packetReliability=4,packetSize;
     public static int packetID;
     public boolean ispacketDelivered=false,isTTLExpired=false,isLargeSize=false,packetTransferedinSlice=false;
     public String packetName;
@@ -35,7 +35,7 @@ public class Packet implements ActionListener
     public Button ok=new Button("OK");
     public Button close=new Button("Close");
     public String endNodesRegion="Same";
-    public ArrayList<Node>   pathHops=new ArrayList<Node>(); 
+    public ArrayList<Node>   pathHops=new ArrayList<Node>();
     Random rand=new Random();
     dtnrouting dtn=new dtnrouting();
     
@@ -51,17 +51,19 @@ public Packet()
 public void refreshPacketSettings()
 {
 	
-	packetID=packetID+1;
+	//packetID=packetID+1;
 	// increment the id of packet and then add it in tpacketNumber
-	packetName ="p"+packetID; //packet Name for reference in code
-	packetSize = 1;   
+	//packetName ="p"+packetID; //packet Name for reference in code
+	
+	packetSize = 0.004096; //512 bytes UDP packet 
     ispacketDelivered=false;  
     isLargeSize=false;
     isTTLExpired=false;
     packetLoad=1;
-    packetTTL=this.maxTTL;
+    packetTTL=maxTTL;
     packetLatency=0;
     packetHops=0;
+    pathHops.clear();
     packetReliability=4;
     packetTransferedinSlice=false;
 }

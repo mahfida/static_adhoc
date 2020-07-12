@@ -14,7 +14,7 @@ public class Node
     public ArrayList<Integer> y_coord = new ArrayList<Integer>();
    //probability of following a coordinate pair
     public ArrayList<Double>  prob_coord = new ArrayList<Double>();
-    public int wholeQueueSize=1, queueSizeLeft, ID, x_inc=0,y_inc=0,nodeX,nodeY,positionTracker, topleft_xcorner,topleft_ycorner, xwidth,yheight;
+    public int  ID, x_inc=0,y_inc=0,nodeX,nodeY,positionTracker, topleft_xcorner,topleft_ycorner, xwidth,yheight;
     // Used to follow part of a data set part
     public int startTracker,direction=1,reliability,number_packet_arrived=0;
     public int radioRange,speed=0,counter=0;//nodeTracker=0;
@@ -25,7 +25,7 @@ public class Node
   
     //packets destined to this node and parameters
     public LinkedList <Packet> nodePackets =  new LinkedList<Packet>();
-    public double msg_latency=0, msg_hops=0, msg_dl=0, msg_relibility=0; 
+    public double msg_latency=0, msg_hops=0, msg_dl=0, msg_relibility=0,wholeQueueSize=1, queueSizeLeft; 
     
     //public HashMap <String, Integer> packetTimeSlots=new HashMap<String, Integer>();
     public HashMap <String, Integer> packetCopies=new HashMap<String, Integer>();
@@ -40,6 +40,10 @@ public class Node
     public pathToDestination ptD;
     // When node is from Datasets
     public int nodePath[][],x_max,y_max;
+    
+    //hop count, bandwidth and path integrity requirements 
+    //of a destination node
+    public double neworkMetricRequirements[] =new double[3];
 //******************************************************************************
 //EMPTY CONSTRUCTOR
 public  Node() {
@@ -62,9 +66,10 @@ public void nodePosition() {
 	  this.reliability =4;
 }
 }
-//******************************************************************************
 
-public void refreshNodeSettings()
+
+//******************************************************************************
+public void clearNodeSettings()
 {
 	
 	packetIDHash.clear();	
@@ -80,6 +85,24 @@ public void refreshNodeSettings()
 	capacity=0; 
 	number_packet_arrived=0;
 	
+}
+
+//******************************************************************************
+//******************************************************************************
+public void refreshNodeSettings()
+{
+	
+	packetIDHash.clear();	
+    queueSizeLeft=wholeQueueSize;
+	DestNPacket.clear();
+	positionTracker=0;
+	prob_coord.clear();
+	nodeX=x_coord.get(0);
+	nodeY=y_coord.get(0);
+	time_slot=1.0;
+	capacity=0; 
+    msg_latency= msg_hops = msg_dl= msg_relibility =0;
+	number_packet_arrived=0;
 }
 
 
