@@ -10,11 +10,11 @@ public class Node
 {
     //Instance variables
 	public static int ID_INCREMENTER;
-    public ArrayList<Integer> x_coord = new ArrayList<Integer>();
-    public ArrayList<Integer> y_coord = new ArrayList<Integer>();
+    public ArrayList<Double> x_coord = new ArrayList<Double>();
+    public ArrayList<Double> y_coord = new ArrayList<Double>();
    //probability of following a coordinate pair
     public ArrayList<Double>  prob_coord = new ArrayList<Double>();
-    public int  ID, x_inc=0,y_inc=0,nodeX,nodeY,positionTracker, topleft_xcorner,topleft_ycorner, xwidth,yheight;
+    public int  ID, x_inc=0,y_inc=0,positionTracker, topleft_xcorner,topleft_ycorner, xwidth,yheight;
     // Used to follow part of a data set part
     public int startTracker,direction=1,reliability,number_packet_arrived=0;
     public int radioRange,speed=0,counter=0;//nodeTracker=0;
@@ -22,7 +22,7 @@ public class Node
     public String name; 
     public NodeMovement node_nm;
     private Random rand =new Random();
-  
+    public Location location;
     //packets destined to this node and parameters
     public LinkedList <Packet> nodePackets =  new LinkedList<Packet>();
     public double msg_latency=0, msg_hops=0, msg_dl=0, msg_relibility=0,wholeQueueSize=1, queueSizeLeft; 
@@ -34,7 +34,7 @@ public class Node
     public int num_packets, packets_ttl;
     
     public LinkedList<Integer> n1_neighborhood = new LinkedList<Integer>(); 
-    public LinkedList<Integer> n2_neighborhood = new LinkedList<Integer>();
+    //public LinkedList<Integer> n2_neighborhood = new LinkedList<Integer>();
     public LinkedList<Double>  link_capacity = new LinkedList<Double>();
     public double time_slot=1.0, capacity=0;
     public pathToDestination ptD;
@@ -61,10 +61,7 @@ public void nodePosition() {
 	this.yheight = dtnrouting.height-2*this.getRadioRange();///4;
 	node_nm.InitialNodePositions(this);
 	
-	this.reliability = rand.nextInt(4)+1;
-	if(this.reliability==5) {
-	  this.reliability =4;
-}
+
 }
 
 
@@ -97,8 +94,8 @@ public void refreshNodeSettings()
 	DestNPacket.clear();
 	positionTracker=0;
 	prob_coord.clear();
-	nodeX=x_coord.get(0);
-	nodeY=y_coord.get(0);
+	this.location.x=x_coord.get(0);
+	this.location.y=y_coord.get(0);
 	time_slot=1.0;
 	capacity=0; 
     msg_latency= msg_hops = msg_dl= msg_relibility =0;
@@ -122,4 +119,16 @@ public int getRadioRange()
     return this.radioRange;
 }
 
+//******************************************************************************
+public Location getLocation() {
+	return(this.location);
+}
+
+//******************************************************************************
+
+public boolean isUAV()
+{
+	if(this.name.contains("U")) return true;
+	else return false;
+}
 }

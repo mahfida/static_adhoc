@@ -224,9 +224,13 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 					node.speed=Integer.parseInt(cspeed.getSelectedItem());
 					nameofnode=cnType.getSelectedItem();
 					node.setRadioRange(Integer.parseInt(cradiorange.getSelectedItem()));
-					node.wholeQueueSize=node.queueSizeLeft=Integer.parseInt(cqueuesize.getSelectedItem());
+					//Limited buffer-size  5 times maximum packet size
+					node.wholeQueueSize=node.queueSizeLeft=500;//0.02048;
 					dtnrouting.allNodes.add(node);
 					node.nodePosition();
+					node.reliability = rand.nextInt(4)+1;
+					if(node.reliability==5) {
+					  node.reliability =4;}
 				}  
 
 				// If from data sets
@@ -285,7 +289,7 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 					// Give size to the destination source pair
 					dtnrouting.destsourcePair= new int [dtnrouting.Destinations.size()];
 			}
-
+			
 
 		}	   
 
@@ -311,8 +315,8 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 
 		// Specify the packet destined for this node
 		// Move this code to when destinations are created
-		node.num_packets = rand.nextInt(20)+1;
-		node.packets_ttl = rand.nextInt(30)+30;
+		node.num_packets = rand.nextInt(5)+1; //rand.nextInt(30)+10;
+		node.packets_ttl = rand.nextInt(100)+100;
 
 		//Below code generates packets for each destination				
 		for(int j=0; j< node.num_packets; j++) {//number of packets that each source will transmit..
@@ -327,7 +331,8 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 
 //******************************************************************************
     public void CreateUAV() {
-    int num_uav=10;
+    Node.ID_INCREMENTER = dtnrouting.allNodes.size();
+    int num_uav=5;
     dtnrouting.uav_index =new int[num_uav];
 	for (int l=0;l < num_uav;l++)
 	{
@@ -346,6 +351,7 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 		//Random position of uav
 		// but can be updated according to old adjacency matrix
 		node.nodePosition();
+		node.reliability = 4;
 	} 
 }
 	//******************************************************************************

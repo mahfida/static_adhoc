@@ -86,18 +86,18 @@ int m=nx.ID-1; int n=ny.ID-1;
 if(encounterPeriod[m][n]==-1)
 {
     encounterPeriod[n][m]=encounterPeriod[m][n]=dtnrouting.timer;
-    firstEncounterPosition[m][n][0]=nx.nodeX;
-    firstEncounterPosition[m][n][1]=nx.nodeY;
-    firstEncounterPosition[m][n][2]=ny.nodeX;
-    firstEncounterPosition[m][n][3]=ny.nodeY;
+    firstEncounterPosition[m][n][0]=nx.location.x;
+    firstEncounterPosition[m][n][1]=nx.location.y;
+    firstEncounterPosition[m][n][2]=ny.location.x;
+    firstEncounterPosition[m][n][3]=ny.location.y;
     lastPeriodStartTime[n][m]=lastPeriodStartTime[m][n]=dtnrouting.timer;
   
 }
 //Total period
-else if(firstEncounterPosition[m][n][0]==nx.nodeX &&
-     firstEncounterPosition[m][n][1]==nx.nodeY &&
-     firstEncounterPosition[m][n][2]==ny.nodeX &&
-     firstEncounterPosition[m][n][3]==ny.nodeY)
+else if(firstEncounterPosition[m][n][0]==nx.location.x &&
+     firstEncounterPosition[m][n][1]==nx.location.y &&
+     firstEncounterPosition[m][n][2]==ny.location.x &&
+     firstEncounterPosition[m][n][3]==ny.location.y)
   {
    encounterPeriod[n][m]= encounterPeriod[m][n]=dtnrouting.timer-encounterPeriod[m][n];
    lastPeriodStartTime[n][m]=lastPeriodStartTime[m][n]=dtnrouting.timer;

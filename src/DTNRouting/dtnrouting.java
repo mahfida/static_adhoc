@@ -39,6 +39,7 @@ public class dtnrouting extends Applet implements Runnable
     public static int latency_avg=0, load_avg=0, bandwidth_avg=0, packetCounter=0, DR_avg=0, nodecount=0;
     public static int source_index[] , dest_index[], uav_index[];
     public static int destsourcePair[];
+    public static  int [] RR,CR, RC, RA, PP, EP, Result; //For dynamic time slot allocation
     // Variables related to movement speeds
     //public static boolean random_movement=false, x_reached=false, y_reached=false;
     public static boolean isdelivered=false, THIS_SIMULATION_ENDED=false, SIMULATION_RUNNING=false;
@@ -97,6 +98,7 @@ public class dtnrouting extends Applet implements Runnable
     public static ArrayList<Packet> arePacketsDelivered=new ArrayList<Packet>();
     public static ArrayList<Node>   Sources=new ArrayList<Node>();				 // contains only source nodes
     public static ArrayList<Node>   Destinations=new ArrayList<Node>();			 // contains only destination nodes
+    public static ArrayList<Node>   TransferNodes=new ArrayList<Node>();			 // contains only destination nodes
 
 //******************************************************************************
 
@@ -263,10 +265,11 @@ public void run()
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         while (true) {
             if(SIMULATION_RUNNING)
-            try { updateInformation.nextPositionForMovement(); 
+           /* try { updateInformation.nextPositionForMovement(); 
             } 
             catch (IOException ex) { Logger.getLogger(dtnrouting.class.getName()).log(Level.SEVERE, null, ex); }
-            repaint();
+           */
+           repaint();
 
              try{ 
                         	Thread.sleep(1000);
@@ -278,7 +281,7 @@ public void run()
           	     updateInformation.UpdateTTLandLatency();
                  //Call transfer function to deliver messages in each time unit
                  if(!dtnrouting.THIS_SIMULATION_ENDED)
-                 playField.TransferPackets();
+                 playField.FivePhaseReservationProtocol();
              }
              if(THIS_SIMULATION_ENDED)
                  updateInformation.simulationSettings(this);

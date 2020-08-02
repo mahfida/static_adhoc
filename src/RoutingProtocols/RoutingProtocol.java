@@ -113,7 +113,7 @@ public void deliver_Destination(Node nx, Node ny, Packet packetObj)
             //packetObj.packetTransferedinSlice=true;
             
             //update nx memory 
-     		nx.capacity -= packetObj.packetSize;
+     		nx.capacity -= 1;//packetObj.packetSize;
             nx.queueSizeLeft+=packetObj.packetSize; // the whole space            
             nx.packetIDHash.remove(packetObj.packetName);
             
@@ -141,10 +141,13 @@ public void deliver_Relay(Node nx, Node ny, Node destNode, Packet packetObj, boo
           
           
           //update nx memory 
-   		  nx.capacity -= packetObj.packetSize;
+   		  nx.capacity -=1;// packetObj.packetSize;
    		  
    		  if(nx_remove_packet)
-          nx.queueSizeLeft+=packetObj.packetSize; // the whole space            
+   		  {
+   			  nx.packetIDHash.remove(packetObj.packetName);
+   			  nx.queueSizeLeft+=packetObj.packetSize; // the whole space  
+   		  }
 
 }
 

@@ -47,12 +47,12 @@ public  void InitialNodePositions(Node n)
 	if(dtnrouting.movementtype.equals("Random") || n.name.substring(0,1).equals("S")){
 	  n.x_coord.clear();
 	  n.y_coord.clear();
-	  n.nodeX =rand.nextInt(n.xwidth) + n.topleft_xcorner; 
+	  n.location.x =(double) (rand.nextInt(n.xwidth) + n.topleft_xcorner); 
 	  //rand.nextInt(dtnrouting.width-n.getRadioRange()) + dtnrouting.x_start;
-      n.x_coord.add(n.nodeX);  //generate random value for x and y positions of node
-      n.nodeY =rand.nextInt(n.yheight) + n.topleft_ycorner; 
+      n.x_coord.add(n.location.x);  //generate random value for x and y positions of node
+      n.location.y =(double) (rand.nextInt(n.yheight) + n.topleft_ycorner); 
       //rand.nextInt(dtnrouting.height-n.getRadioRange()) + dtnrouting.y_start;
-      n.y_coord.add(n.nodeY);
+      n.y_coord.add(n.location.y);
       n.prob_coord.add(rand.nextDouble());
       n.positionTracker=0;}
 	// For pseudo-random and the dataset
@@ -61,14 +61,14 @@ public  void InitialNodePositions(Node n)
 		n.positionTracker=0;
 		//System.out.println(n.name);
 		InitializePsuedoPath(n);
-        n.nodeX=n.x_coord.get(n.positionTracker); 
-    	n.nodeY=n.y_coord.get(n.positionTracker);
+        n.location.x=n.x_coord.get(n.positionTracker); 
+    	n.location.y=n.y_coord.get(n.positionTracker);
       }
 	  // For pseudo-random and the dataset
 	  else if(dtnrouting.movementtype.equals("Dataset") & !n.name.substring(0,1).equals("S"))
 	  {     
-	        n.nodeX=n.x_coord.get(n.startTracker); 
-	    	n.nodeY=n.y_coord.get(n.startTracker);
+	        n.location.x=n.x_coord.get(n.startTracker); 
+	    	n.location.y=n.y_coord.get(n.startTracker);
 	  }
       
 	n.moveFlag=true;
@@ -97,28 +97,28 @@ public void RandomMovement(Node n)
         if(n.speed>=speedController)
         {
         	
-        	if (n.x_coord.get(n.positionTracker)< n.nodeX)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
-                           n.nodeX--;
+        	if (n.x_coord.get(n.positionTracker)< n.location.x)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
+                           n.location.x--;
 
-            else if(n.x_coord.get(n.positionTracker)>n.nodeX)
-                            n.nodeX++;
+            else if(n.x_coord.get(n.positionTracker)>n.location.x)
+                            n.location.x++;
 
        
-        	if(n.y_coord.get(n.positionTracker)< n.nodeY)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
-                           n.nodeY--;
+        	if(n.y_coord.get(n.positionTracker)< n.location.y)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
+                           n.location.y--;
 
-            else if(n.y_coord.get(n.positionTracker)>n.nodeY)
-                            n.nodeY++;
+            else if(n.y_coord.get(n.positionTracker)>n.location.y)
+                            n.location.y++;
            
            // Choose random location for x-coordinate and y-coordinate
            // 20 different positions	
-           if(n.x_coord.get(n.positionTracker)==n.nodeX & n.y_coord.get(n.positionTracker)==n.nodeY){
+           if(n.x_coord.get(n.positionTracker)==n.location.x & n.y_coord.get(n.positionTracker)==n.location.y){
         	 
         	 if(n.positionTracker==19)
         		 	n.positionTracker =0;
         	 else {
-		             n.x_coord.add(rand.nextInt(n.xwidth) + n.topleft_xcorner);  
-		             n.y_coord.add(rand.nextInt(n.yheight) + n.topleft_ycorner);
+		             n.x_coord.add((double) (rand.nextInt(n.xwidth) + n.topleft_xcorner));  
+		             n.y_coord.add((double) (rand.nextInt(n.yheight) + n.topleft_ycorner));
 		             n.positionTracker=n.positionTracker+1;
 		             n.prob_coord.add(rand.nextDouble());
              }
@@ -141,8 +141,8 @@ public void InitializePsuedoPath(Node n)
  
 	int loc=rand.nextInt(10)+3;
 	for(int i=0;i< loc-1 ;i++) {
-		  n.x_coord.add(rand.nextInt(n.xwidth) + n.topleft_xcorner);  
-          n.y_coord.add(rand.nextInt(n.yheight) + n.topleft_ycorner);
+		  n.x_coord.add((double) (rand.nextInt(n.xwidth) + n.topleft_xcorner));  
+          n.y_coord.add((double) (rand.nextInt(n.yheight) + n.topleft_ycorner));
           n.prob_coord.add(rand.nextDouble()); // probability of staying at this location 
    }
 //	System.out.println(n.x_coord);
@@ -177,21 +177,21 @@ public void Follow_PseudoRandomPath(Node n)
 	        if(n.speed>=speedController)
 	        {
 	        	
-	        	if (n.x_coord.get(n.positionTracker)< n.nodeX)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
-	                           n.nodeX--;
+	        	if (n.x_coord.get(n.positionTracker)< n.location.x)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
+	                           n.location.x--;
 
-	            else if(n.x_coord.get(n.positionTracker)>n.nodeX)
-	                            n.nodeX++;
+	            else if(n.x_coord.get(n.positionTracker)>n.location.x)
+	                            n.location.x++;
 
 	       
-	        	if(n.y_coord.get(n.positionTracker)< n.nodeY)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
-	                           n.nodeY--;
+	        	if(n.y_coord.get(n.positionTracker)< n.location.y)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
+	                           n.location.y--;
 
-	            else if(n.y_coord.get(n.positionTracker)>n.nodeY)
-	                            n.nodeY++;
+	            else if(n.y_coord.get(n.positionTracker)>n.location.y)
+	                            n.location.y++;
 	           
 	           // Choose random location for x-coordinate and y-coordinate
-	           if(n.x_coord.get(n.positionTracker)==n.nodeX & n.y_coord.get(n.positionTracker)==n.nodeY){
+	           if(n.x_coord.get(n.positionTracker)==n.location.x & n.y_coord.get(n.positionTracker)==n.location.y){
 	               if((n.positionTracker+1)==n.x_coord.size())  //If reached end, traverse back
 	            	   n.positionTracker=0;
 	               else 
@@ -209,22 +209,22 @@ public void Follow_DatasetPath(Node n)
 	        if(n.speed>=speedController)
 	        {
 	        	
-	        	if (n.x_coord.get(n.positionTracker)< n.nodeX)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
-	                           n.nodeX--;
+	        	if (n.x_coord.get(n.positionTracker)< n.location.x)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
+	                           n.location.x--;
 
-	            else if(n.x_coord.get(n.positionTracker)>n.nodeX)
-	                            n.nodeX++;
+	            else if(n.x_coord.get(n.positionTracker)>n.location.x)
+	                            n.location.x++;
 
 	       
-	        	if(n.y_coord.get(n.positionTracker)< n.nodeY)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
-	                           n.nodeY--;
+	        	if(n.y_coord.get(n.positionTracker)< n.location.y)  //nextX show the new position of x coordinates its value is randomly generated above and x_n[i] is the random no genarated above
+	                           n.location.y--;
 
-	            else if(n.y_coord.get(n.positionTracker)>n.nodeY)
-	                            n.nodeY++;
+	            else if(n.y_coord.get(n.positionTracker)>n.location.y)
+	                            n.location.y++;
 	           
 	           // Choose next location for x-coordinate and y-coordinate
 		       
-		           if(n.x_coord.get(n.positionTracker)==n.nodeX & n.y_coord.get(n.positionTracker)==n.nodeY){
+		           if(n.x_coord.get(n.positionTracker)==n.location.x & n.y_coord.get(n.positionTracker)==n.location.y){
 		               if((n.positionTracker+1)==n.x_coord.size())  //If reached end, traverse back
 		        	   n.positionTracker=0;
 		               

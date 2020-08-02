@@ -86,8 +86,8 @@ public void Paths_allNodes() throws IOException
              token=token+1;
              s=st.nextToken();
              if(token<5)         pathDetail[j][k][token]=Double.parseDouble(s);//source
-             else if(token==5)   dtnrouting.allNodes.get(j).x_coord.add(Integer.parseInt(s));//x-coord
-             else if(token==6)   dtnrouting.allNodes.get(j).y_coord.add(Integer.parseInt(s));//y-coord
+             else if(token==5)   dtnrouting.allNodes.get(j).x_coord.add(Double.parseDouble(s));//x-coord
+             else if(token==6)   dtnrouting.allNodes.get(j).y_coord.add(Double.parseDouble(s));//y-coord
          }
          dtnrouting.allNodes.get(j).prob_coord.add(pathDetail[j][k][4]);
          i=i+1;

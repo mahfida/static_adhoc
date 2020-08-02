@@ -11,7 +11,10 @@ import java.io.PrintWriter;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 
 
@@ -41,7 +44,17 @@ public void UpdateTTLandLatency()
 	  //1. Update simulation timer
       df2.setRoundingMode(RoundingMode.DOWN);
 	  dtnrouting.timer+=1;
-      
+      //2. Set Dynamic TSA arrays to default value
+	    Arrays.fill(dtnrouting.RR, -1);
+	    Arrays.fill(dtnrouting.CR, -1);
+	    Arrays.fill(dtnrouting.RC, -1);
+	    Arrays.fill(dtnrouting.RA, -1);
+	    Arrays.fill(dtnrouting.PP, -1);
+	    Arrays.fill(dtnrouting.EP, -1);
+	    Arrays.fill(dtnrouting.Result, -1);
+	    dtnrouting.TransferNodes.clear();
+	  
+	  //3. Update delivered and expired packets information
 	  for(int h=0;h < dtnrouting.arePacketsDelivered.size();h++)
       {   Packet packetObj=dtnrouting.arePacketsDelivered.get(h);
           packetObj.packetTTL-=1;
@@ -51,9 +64,10 @@ public void UpdateTTLandLatency()
           if(packetObj.packetTTL==0){
             //if packet's TTL expires, it cannot be delivered else if
             packetObj.isTTLExpired=true;
+            packetObj.packetLatency=packetObj.maxTTL;
             dtnrouting.total_packetsDeliveredExpired += 1;}}}
       
-     //2. When packets are delivered or expired
+     //4. When packets are delivered or expired
 	 //   store summary of results
 	 //   stop simulation temporarily
      if(dtnrouting.total_packetsDeliveredExpired==dtnrouting.arePacketsDelivered.size() 
@@ -70,18 +84,29 @@ public void UpdateTTLandLatency()
 	    	  for(int m=0; m < destNode.nodePackets.size(); m++)
 	    	  {
 	    		  destNode.msg_latency+=destNode.nodePackets.get(m).packetLatency;
-	    		  destNode.msg_hops+=destNode.nodePackets.get(m).packetHops;  
-	    		  destNode.msg_relibility+=destNode.nodePackets.get(m).packetReliability;
-	    		  if(destNode.nodePackets.get(m).ispacketDelivered) 
+	    		    
+	    		  
+	    		  if(destNode.nodePackets.get(m).ispacketDelivered) {
+	    			destNode.msg_relibility+=destNode.nodePackets.get(m).packetReliability;
+	    			destNode.msg_hops+=destNode.nodePackets.get(m).packetHops;
 	    		    destNode.msg_dl+=1;
+	    		    
+	    		  }
 	    		  if(destNode.nodePackets.get(m).isTTLExpired)
 	    			  expired +=1;
 	    	  }
-	    	  
-	    	  destNode.msg_latency = (double)destNode.msg_latency / destNode.num_packets;
-	    	  destNode.msg_hops = (int)destNode.msg_hops / destNode.num_packets;
-	    	  destNode.msg_dl =  (double)destNode.msg_dl / destNode.num_packets;
-	    	  destNode.msg_relibility = (double)destNode.msg_relibility / destNode.num_packets;
+	    	  // Hops and reliability for delivered messages
+	    	  if(destNode.msg_dl>0) {
+	    	  destNode.msg_hops = (int)destNode.msg_hops / destNode.msg_dl;    	  
+	          destNode.msg_relibility = (double)destNode.msg_relibility / (double) destNode.msg_dl;}
+	    	  else {
+	    		  //INVALID NUMBERS
+	    		  destNode.msg_hops=9999;
+	    		  destNode.msg_relibility=9999;
+	    	  }
+	    	  destNode.msg_latency = (double)destNode.msg_latency / (double) destNode.num_packets;
+	    	  destNode.msg_dl =  (double)destNode.msg_dl / (double) destNode.num_packets;
+	    	 
 	  	      
 	    	  if(sb.length()==0)
 	    	  sb.append("simulation_run, type, dest,  latency, hop , delivery, failure, reliability\n");
@@ -207,8 +232,9 @@ public void simulationSettings(dtnrouting dtn)
         	     cnObj.PacketsforDestination(dtnrouting.allNodes.get(g));}}
         	
         	//Remove UAV Nodes
-        	dtnrouting.allNodes.subList(dtnrouting.uav_index[0], 
-        	dtnrouting.uav_index[dtnrouting.uav_index.length]).clear();
+        	dtnrouting.allNodes.subList(dtnrouting.uav_index[0], dtnrouting.uav_index[0] +
+        			dtnrouting.uav_index.length).clear();
+        	
 	       
            //Take a break of one second
 	       try

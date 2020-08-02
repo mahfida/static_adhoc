@@ -24,16 +24,27 @@ public class QoITPATH implements ActionListener
 
 	//******************************************************************************
 	public void ShortestPathsSD() {
-
-		// Initialize the adjacency table
-		dtnrouting.adjacencyMatrix =new double[dtnrouting.allNodes.size()][dtnrouting.allNodes.size()];
+		int total_nodes = dtnrouting.allNodes.size();
+		System.out.println("Nodes size: "+total_nodes +"Senario"+dtnrouting.SIMULATION_PART);
 		
+		
+		// Initialize the adjacency table
+		dtnrouting.adjacencyMatrix =new double[total_nodes][total_nodes];
+		
+		// Initialize the Dynamic TSA arrays
+		dtnrouting.RR=new int[total_nodes];
+		dtnrouting.CR=new int[total_nodes];
+		dtnrouting.RC=new int[total_nodes];
+		dtnrouting.RA=new int[total_nodes]; 
+		dtnrouting.PP=new int[total_nodes];
+		dtnrouting.EP=new int[total_nodes];
+		dtnrouting.Result=new int[total_nodes];
 		// Calculate Adjacency matrix
 		dtnrouting.source_index = new int[dtnrouting.Sources.size()];
 		dtnrouting.dest_index = new int[dtnrouting.Destinations.size()];
 		int s_counter=0 , d_counter=0;
 
-		for (int i = 0; i < (dtnrouting.allNodes.size()-1); i++) {
+		for (int i = 0; i < (total_nodes-1); i++) {
 			dtnrouting.adjacencyMatrix[i][i] = 0;
 			if(dtnrouting.allNodes.get(i).name.substring(0,1).equals("S"))
 				dtnrouting.source_index[s_counter++] = i;
@@ -45,11 +56,11 @@ public class QoITPATH implements ActionListener
 		pf.FindNeighborhoods();
 
 		// For last node
-		dtnrouting.adjacencyMatrix[dtnrouting.allNodes.size()-1][dtnrouting.allNodes.size()-1]=0;
-		if(dtnrouting.allNodes.get(dtnrouting.allNodes.size()-1).name.substring(0,1).equals("S"))
-			dtnrouting.source_index[s_counter++] = dtnrouting.allNodes.size()-1;
-		else if(dtnrouting.allNodes.get(dtnrouting.allNodes.size()-1).name.substring(0,1).equals("D"))
-			dtnrouting.dest_index[d_counter++] = dtnrouting.allNodes.size()-1;
+		dtnrouting.adjacencyMatrix[total_nodes-1][total_nodes-1]=0;
+		if(dtnrouting.allNodes.get(total_nodes-1).name.substring(0,1).equals("S"))
+			dtnrouting.source_index[s_counter++] = total_nodes-1;
+		else if(dtnrouting.allNodes.get(total_nodes-1).name.substring(0,1).equals("D"))
+			dtnrouting.dest_index[d_counter++] = total_nodes-1;
 
 		// Find shortest path from each source to each destination
 		System.out.println("Path from source nodes");
