@@ -17,7 +17,8 @@ public class PlayField extends RoutingProtocol
 {
 	//Instance Variables
 	static boolean hasDeliverCalled[][]=new boolean[dtnrouting.allNodes.size()][dtnrouting.allNodes.size()];
-	static dtnrouting dtn=new dtnrouting();	
+	static dtnrouting dtn=new dtnrouting();
+	private boolean sendRR;	
 
 	//******************************************************************************
 	//EMPTY CONSTRUCTOR
@@ -123,28 +124,48 @@ public class PlayField extends RoutingProtocol
 	// Five phase reservation protocol	
 	public void FivePhaseReservationProtocol()
 	{	
-	// 1. Identify nodes with messages---prob. (0.5)	
+	// 1. Identify nodes with messages
+	    ArrayList<Node> relayNodes =new ArrayList<Node>();
+		 for (int a = 0; a < dtnrouting.allNodes.size(); a++) {
+			 Node ni = dtnrouting.allNodes.get(a);
+		     int relay_packets = ni.packetIDHash.size()-ni.number_packet_arrived;
+		     if(relay_packets >0) {
+		    	 ni.transmit_prob = new Random().nextDouble();
+		    	 System.out.println("Prob of:"+ni.name+" is "+ni.transmit_prob);
+		    	 relayNodes.add(ni);}
+		 }
+	
 	// FINAL Result:0->IDLE, 1=BLOCK, 2=RECIEVE, 3=TRANSMIT
 	// 2. Initially RR [] = (-1) for all nodes
 	//Each node with a msg to transfer, should updates its value to "t=0" in its RR array and
 	// updates it neighboring nodes with r=1, If a node receives multiple 'r',its RR >1
 	// RR[i] = 
-	 for (int a = 0; a < dtnrouting.allNodes.size(); a++) {
-			Node ni = dtnrouting.allNodes.get(a);
-	        int relay_packets = ni.packetIDHash.size()-ni.number_packet_arrived;
-	        
-	        double prob = new Random().nextDouble();
-			if(relay_packets > 0 & prob>=0.5) {
-				System.out.println(ni.ID+" PACKETS:"+ni.packetIDHash.size()+", ARRIVED:"+ni.number_packet_arrived);
-				//Move forward only if it has not received
+	 for (int a = 0; a < relayNodes.size(); a++) {
+		 Node ni = relayNodes.get(a);
+		 //System.out.println("Relay node:"+ni.name);
+		 //System.out.println("size:"+relayNodes.size());
+	     sendRR = true;
+	     
+	     for(int b=0; b < ni.n2_neighborhood.size(); b++)
+	     	{   
+	    	 Node nj = ni.n2_neighborhood.get(b);
+	    	 if(relayNodes.contains(nj) & nj.transmit_prob > ni.transmit_prob)
+	    		 sendRR = false;}
+					 
+			    
+			    //Move forward only if it has not received
 				//an RR from its neigbour node
-				if(dtnrouting.RR[ni.ID-1]==-1) {
-				dtnrouting.RR[ni.ID-1] = 0;
-			    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
-				Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
-				if(dtnrouting.RR[nj.ID-1]==(-1)) dtnrouting.RR[nj.ID-1] = 1;
-				else							 dtnrouting.RR[nj.ID-1] += 1;}}}}
-			
+				
+		if(sendRR & dtnrouting.RR[ni.ID-1]==-1 ) { dtnrouting.RR[ni.ID-1] = 0;
+				  System.out.println("Delay:"+dtnrouting.timer+", RR:"+ni.name);
+				  
+		for(int p =0; p < ni.n1_neighborhood.size(); p++) {
+				  Node nj = ni.n1_neighborhood.get(p);
+				  if(dtnrouting.RR[nj.ID-1]==(-1)) dtnrouting.RR[nj.ID-1] = 1; else
+				  dtnrouting.RR[nj.ID-1] += 1; }}
+				 
+		}
+
 	// 3. Initially CR[] = (-1) for all nodes	
 	// If a node's RR value > 1, it updates its CR  value  to t=0, and its neighbor CR value to r=1
 	// Nodes with CR value > (-1) are considered IDLE=I
@@ -154,22 +175,26 @@ public class PlayField extends RoutingProtocol
 				dtnrouting.CR[ni.ID-1] = 0;
 				dtnrouting.Result[ni.ID-1]=0; //INDICATION FOR IDLE STATE
 			    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
-				Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
+				Node nj = ni.n1_neighborhood.get(p);
 				dtnrouting.CR[nj.ID-1] = 1;
+				//System.out.println("I M IN CC");
 				dtnrouting.Result[nj.ID-1]=0; //INDICATION FOR IDLE STATE;
 				}}}
 	
 	// *****IF A NODE HAS RR =0 AND CR=-1, IT BECOMES A TRANSMITTING NODE TN***********	
 	// 4. Initially RC [] = (-1) for all nodes
 	// If a node with RR value 0 and CR value = -1, it sets its RC to t=0, and its neighbor RC to r=1
-	 for (int a = 0; a < dtnrouting.allNodes.size(); a++) {
-			Node ni = dtnrouting.allNodes.get(a);
+	 for (int a = 0; a < relayNodes.size(); a++) {
+			Node ni = relayNodes.get(a);
+			//System.out.println("I M IN TM1");
 			if(dtnrouting.RR[ni.ID-1] == 0 & dtnrouting.CR[ni.ID-1] ==(-1)) {
 				dtnrouting.TransferNodes.add(ni);
+				System.out.println("Delay:"+dtnrouting.timer+", TN:"+ni.name);
 				dtnrouting.RC[ni.ID-1]=0;
 			    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
-					Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
+					Node nj = ni.n1_neighborhood.get(p);
 					dtnrouting.RC[nj.ID-1] = 1;}}}
+
 
 	// 5. Initially RA [] = -1  for all nodes
 	// If a node has its RC value = 1, it sets its RA value t=0 and neighbor RA to r=1
@@ -178,7 +203,7 @@ public class PlayField extends RoutingProtocol
 			if(dtnrouting.RC[ni.ID-1] == 1) {
 				dtnrouting.RA[ni.ID-1]=0;
 			    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
-					Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
+					Node nj = ni.n1_neighborhood.get(p);
 					dtnrouting.RA[nj.ID-1] = 1;}}}
 	
 	// 6. Initially PP[] = -1 for all nodes
@@ -189,7 +214,7 @@ public class PlayField extends RoutingProtocol
 				dtnrouting.PP[ni.ID-1]=0;
 				dtnrouting.Result[ni.ID-1]=1; //INDICATION FOR BLOCK STATE;
 			    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
-					Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
+					Node nj = ni.n1_neighborhood.get(p);
 					dtnrouting.PP[nj.ID-1] = 1;
 					dtnrouting.Result[nj.ID-1]=0; //INDICATION FOR IDLE STATE;
 					}}}
@@ -204,13 +229,16 @@ public class PlayField extends RoutingProtocol
 			else
 			if(prob>=0) {//not yet set it, since we filter out adjacent nodes early
 			dtnrouting.EP[ni.ID-1] = 0;
+			// System.out.println("Delay:"+dtnrouting.timer+", Sending:"+ni.name);
 			dtnrouting.Result[ni.ID-1]=3; //INDICATION FOR TRANSMIT STATE;
 			
 			for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
-					Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
+					Node nj = ni.n1_neighborhood.get(p);
 					dtnrouting.EP[nj.ID-1] = 1;
 					dtnrouting.Result[nj.ID-1]=2; //INDICATION FOR RECIEVE STATE;
 			}}}
+	
+	 relayNodes.clear();
 	 TransferPackets();	
 	}
 	
@@ -279,11 +307,11 @@ public class PlayField extends RoutingProtocol
 						ni.link_capacity.add(capacity);
 						nj.link_capacity.add(capacity);
 						//System.out.print("-"+(j+1));
-						ni.n1_neighborhood.add(j);
-						nj.n1_neighborhood.add(i);
+						ni.n1_neighborhood.add(nj);
+						nj.n1_neighborhood.add(ni);
 						
-						//ni.n2_neighborhood.add(j);
-						//nj.n2_neighborhood.add(i);
+						ni.n2_neighborhood.add(nj);
+						nj.n2_neighborhood.add(ni);
 					}else 
 					dtnrouting.adjacencyMatrix[i][j] = dtnrouting.adjacencyMatrix[j][i]=0;}
 		}
@@ -295,18 +323,20 @@ public class PlayField extends RoutingProtocol
 		*/
 		// for each node in the network
 		
-		/*
-		 * for (int i = 0; i < dtnrouting.allNodes.size(); i++) { Node ni =
-		 * dtnrouting.allNodes.get(i);
-		 * 
-		 * // for each n1 neighbor for(int j = 0; j < ni.n1_neighborhood.size(); j++) {
-		 * Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(j)); // find n2
-		 * neighbors for(int k = 0; k < nj.n1_neighborhood.size(); k++) { Node nk =
-		 * dtnrouting.allNodes.get(nj.n1_neighborhood.get(k)); // If nk is not in n2
-		 * linked list yet if(ni.ID != nk.ID &
-		 * !ni.n2_neighborhood.contains(nj.n1_neighborhood.get(k)) )
-		 * ni.n2_neighborhood.add(nj.n1_neighborhood.get(k)); }} }
-		 */			
+		
+		  for (int i = 0; i < dtnrouting.allNodes.size(); i++) { 
+			  Node ni = dtnrouting.allNodes.get(i);
+		  
+		  // for each n1 neighbor 
+		 for(int j = 0; j < ni.n1_neighborhood.size(); j++) {
+		  Node nj = ni.n1_neighborhood.get(j); // find n2
+		  //neighbors 
+		  for(int k = 0; k < nj.n1_neighborhood.size(); k++) { 
+			  Node nk = nj.n1_neighborhood.get(k); // If nk is not in n2
+		  //linked list yet 
+			if(ni.ID != nk.ID & !ni.n2_neighborhood.contains(nj.n1_neighborhood.get(k)) )
+		    ni.n2_neighborhood.add(nj.n1_neighborhood.get(k)); }} }
+		 			
 	
 
 }// Find neighbor hood ended
@@ -319,12 +349,12 @@ public void TransferPackets()
 	    for (int a = 0; a < dtnrouting.TransferNodes.size(); a++) {
 	    
 		Node ni = dtnrouting.TransferNodes.get(a);
-		System.out.println("TN-all:"+ni.ID);
 		if(dtnrouting.Result[ni.ID-1] ==3) {
+			System.out.println("Transfer Packer NODE:" +ni.name);
 	    for(int p =0; p <  ni.n1_neighborhood.size(); p++) {
 			// Available capacity for link with k n1_neighbor
 			ni.capacity= (double)(ni.link_capacity.get(p));
-			Node nj = dtnrouting.allNodes.get(ni.n1_neighborhood.get(p));
+			Node nj =ni.n1_neighborhood.get(p);
 			
 			if((!nj.name.contains("S") & nj.queueSizeLeft > 0) ||
 			  (ni.DestNPacket.containsValue(nj)))

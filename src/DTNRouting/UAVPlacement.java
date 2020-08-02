@@ -1,45 +1,54 @@
 package DTNRouting;
-import java.io.IOException;
-import java.io.PrintWriter;
+//import java.io.IOException;
+//import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Random;
+//import java.util.HashMap;
+//import java.util.LinkedHashSet;
+//import java.util.List;
+//import java.util.Random;
 import java.util.Stack;
 
 public class UAVPlacement {
 
 	private double minDist_km = 6.0;
-	private double maxDist_km = 5.0;
+	//private double maxDist_km = 5.0;
 	private double uav_speed_kph = 2.0; // 120.0
-	private double radioRange_km = 5.0;
+	//private double radioRange_km = 5.0;
 	
-	private int bestTechnique = 0; // 0 - distance; 1 - Capacity:Distance ; 2 - Capacity:SINR
-	private static int nMovesUAV = 0;
+	//private int bestTechnique = 0; // 0 - distance; 1 - Capacity:Distance ; 2 - Capacity:SINR
+	//private static int nMovesUAV = 0;
 	
-	
-	double calcDistance_km(Location node1, Location node2) {
-		double diffX = (node1.x-node2.x)*(node1.x-node2.x);
-		double diffY = (node1.y-node2.y)*(node1.y-node2.y);
+//********************************************************************		
+	// Distance between two locations
+	double calcDistance_km(Location l1, Location l2) {
+		double diffX = (l1.x-l2.x)*(l1.x-l2.x);
+		double diffY = (l1.y-l2.y)*(l1.y-l2.y);
 		
 		double distanceKm = Math.sqrt(diffX + diffY);
 		return distanceKm;
 	}
-	
+
+//********************************************************************	
+	//This methods returns the location for uav "thisUAV"
+	// mid-point of largest empty space between two nodes 
 	public Location getUAVLocation(Node thisUAV, ArrayList<Node> Nodes) {
 		Location bestPoint = getLargestCircle(thisUAV, Nodes);
 		return bestPoint;
 	}
-	
+//********************************************************************		
+	// This method seems to identify location of the closest uav to "thisUAV"
+	// but does not use the information and instead switches to find 
+	// mid point of largest empty circle
+	// " AN INCOMPLETE FUNCTION"
 	public Location getNewUAVLocationsDistances1(Node thisUAV, Location thisLocation, ArrayList<Node> Nodes) {
 
 
-		Location closestLocation = thisLocation;
+		//Location closestLocation = thisLocation;
 		double closestUAVDist_km = Double.MAX_VALUE;
 		Location closestUAV = thisLocation;
 		int nUAVs = 0;
-		/* Take into consideration other UAVs locations */
+		/* Take into consideration other UAVs locations 
+		 * , identify the UAV closet to this UAV*/
 		for (Node destUAV : Nodes) {	
 			if (destUAV.isUAV()) {
 				nUAVs++;
@@ -57,7 +66,8 @@ public class UAVPlacement {
 
 	}
 
-	
+//********************************************************************	
+	// Current code does not do anything
 	/**
 	 * This routine takes into consideration the nearest UAVS and Hull point to get the next optimal
 	 * @param thisUAV
@@ -74,6 +84,7 @@ public class UAVPlacement {
 		Location closestUAV = thisLocation;
 		int nUAVs = 0;
 		/* Take into consideration other UAVs locations */
+		// It finds nearest uav to "thisUAV"
 		for (Node destUAV : Nodes) {	
 			if (destUAV.isUAV()) {
 				nUAVs++;
@@ -101,6 +112,7 @@ public class UAVPlacement {
 	}
 	
 
+//********************************************************************
 	
 	/**
 	 * Get the longest link between units' closest neighbours
@@ -147,7 +159,8 @@ public class UAVPlacement {
 		return (bestPoint);
 	}
 
-	
+//********************************************************************	
+	//The method is not doing anything.
 	/**
 	 * This routine takes the distance between units to get the new location
 	 * @param thisUAV
@@ -157,7 +170,9 @@ public class UAVPlacement {
 	 * @param useHull
 	 * @return
 	 */
-	public Location getNewUAVLocationsDistances(Node thisUAV, Location thisLocation, ArrayList<Node> Nodes, Stack<Location> GroupHull, boolean useHull) {
+	public Location getNewUAVLocationsDistances(Node thisUAV, Location thisLocation, 
+			                                    ArrayList<Node> Nodes, Stack<Location> GroupHull, 
+			                                    boolean useHull) {
 		Location closestLocation = thisLocation;
 		double closestUAVDist_km = Double.MAX_VALUE;
 		Location closestUAV = thisLocation;
@@ -182,6 +197,8 @@ public class UAVPlacement {
 		return closestLocation;
 	}
 
+
+//********************************************************************	
 	
 	/**
 	 * This routine takes into consideration the nearest UAVS and Hull point to get the next optimal
@@ -192,7 +209,9 @@ public class UAVPlacement {
 	 * @param useHull
 	 * @return
 	 */
-	public Location getNewUAVLocationsDistancesActualOld(Node thisUAV, Location thisLocation, ArrayList<Node> Nodes, Stack<Location> GroupHull, boolean useHull) {
+	public Location getNewUAVLocationsDistancesActualOld(Node thisUAV, Location thisLocation, 
+														ArrayList<Node> Nodes, Stack<Location> GroupHull, 
+														boolean useHull) {
 
 
 		Location closestLocation = thisLocation;
@@ -296,6 +315,9 @@ public class UAVPlacement {
 
 	}
 
+//********************************************************************	
+	// Finds the largest distance between two set of nodes
+	// such that their is no node between them
 	public Location getLargestCircle(Node thisNode, ArrayList<Node> Nodes) {
 		/* Get the largest minimum distance between two units */
 
@@ -328,6 +350,9 @@ public class UAVPlacement {
 		return bestPoint;
 	}
 	
+//********************************************************************	
+	// Find if the circle with center "Center" and radius "radius_km"
+	// has no other node and is empty.
 	public boolean isEmptyCircle(Node Unit1, Node Unit2, ArrayList<Node> usedNodes, Location Centre, double radius_km) {
 		boolean empty = true;
 		for (Node Unit : usedNodes) {
@@ -339,7 +364,7 @@ public class UAVPlacement {
 		return empty;
 	}
 
-	
+//********************************************************************		
 	public double getUav_speed_kph() {
 		return uav_speed_kph;
 	}

@@ -51,6 +51,7 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 
 	//In order to pass values to the object of CreateNode`
 	public int numberofnodes, speedofnode, radiorangeofnode;
+	public UAVPlacement uav_placement = new UAVPlacement();
 	
 
 	//other variables
@@ -315,8 +316,8 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 
 		// Specify the packet destined for this node
 		// Move this code to when destinations are created
-		node.num_packets = rand.nextInt(5)+1; //rand.nextInt(30)+10;
-		node.packets_ttl = rand.nextInt(100)+100;
+		node.num_packets = rand.nextInt(5)+5; //rand.nextInt(30)+10;
+		node.packets_ttl = rand.nextInt(50)+50;
 
 		//Below code generates packets for each destination				
 		for(int j=0; j< node.num_packets; j++) {//number of packets that each source will transmit..
@@ -350,7 +351,8 @@ public class CreateNode extends dtnrouting  implements ItemListener, ActionListe
 		
 		//Random position of uav
 		// but can be updated according to old adjacency matrix
-		node.nodePosition();
+		//node.nodePosition();
+		node.location = uav_placement.getUAVLocation(node, dtnrouting.allNodes);
 		node.reliability = 4;
 	} 
 }

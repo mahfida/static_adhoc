@@ -47,10 +47,10 @@ public  void InitialNodePositions(Node n)
 	if(dtnrouting.movementtype.equals("Random") || n.name.substring(0,1).equals("S")){
 	  n.x_coord.clear();
 	  n.y_coord.clear();
-	  n.location.x =(double) (rand.nextInt(n.xwidth) + n.topleft_xcorner); 
+	  n.location.x =(double)(n.topleft_xcorner) + (n.xwidth - 0) * rand.nextDouble();
 	  //rand.nextInt(dtnrouting.width-n.getRadioRange()) + dtnrouting.x_start;
       n.x_coord.add(n.location.x);  //generate random value for x and y positions of node
-      n.location.y =(double) (rand.nextInt(n.yheight) + n.topleft_ycorner); 
+      n.location.y =(double)(n.topleft_ycorner) + (n.yheight - 0) * rand.nextDouble(); 
       //rand.nextInt(dtnrouting.height-n.getRadioRange()) + dtnrouting.y_start;
       n.y_coord.add(n.location.y);
       n.prob_coord.add(rand.nextDouble());
@@ -117,8 +117,8 @@ public void RandomMovement(Node n)
         	 if(n.positionTracker==19)
         		 	n.positionTracker =0;
         	 else {
-		             n.x_coord.add((double) (rand.nextInt(n.xwidth) + n.topleft_xcorner));  
-		             n.y_coord.add((double) (rand.nextInt(n.yheight) + n.topleft_ycorner));
+		             n.x_coord.add((double)n.topleft_xcorner + (n.xwidth - 0) * rand.nextDouble());  
+		             n.y_coord.add((double)n.topleft_ycorner + (n.yheight - 0) * rand.nextDouble());
 		             n.positionTracker=n.positionTracker+1;
 		             n.prob_coord.add(rand.nextDouble());
              }
@@ -141,8 +141,8 @@ public void InitializePsuedoPath(Node n)
  
 	int loc=rand.nextInt(10)+3;
 	for(int i=0;i< loc-1 ;i++) {
-		  n.x_coord.add((double) (rand.nextInt(n.xwidth) + n.topleft_xcorner));  
-          n.y_coord.add((double) (rand.nextInt(n.yheight) + n.topleft_ycorner));
+		  n.x_coord.add((double)n.topleft_xcorner + (n.xwidth - 0) * rand.nextDouble());  
+          n.y_coord.add((double)n.topleft_ycorner + (n.yheight - 0) * rand.nextDouble());
           n.prob_coord.add(rand.nextDouble()); // probability of staying at this location 
    }
 //	System.out.println(n.x_coord);

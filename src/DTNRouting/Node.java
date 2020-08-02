@@ -22,10 +22,10 @@ public class Node
     public String name; 
     public NodeMovement node_nm;
     private Random rand =new Random();
-    public Location location;
+    public Location location=new Location();
     //packets destined to this node and parameters
     public LinkedList <Packet> nodePackets =  new LinkedList<Packet>();
-    public double msg_latency=0, msg_hops=0, msg_dl=0, msg_relibility=0,wholeQueueSize=1, queueSizeLeft; 
+    public double transmit_prob, msg_latency=0, msg_hops=0, msg_dl=0, msg_relibility=0,wholeQueueSize=1, queueSizeLeft; 
     
     //public HashMap <String, Integer> packetTimeSlots=new HashMap<String, Integer>();
     public HashMap <String, Integer> packetCopies=new HashMap<String, Integer>();
@@ -33,9 +33,9 @@ public class Node
     public HashMap <Packet, Node> DestNPacket=new HashMap<Packet, Node>();
     public int num_packets, packets_ttl;
     
-    public LinkedList<Integer> n1_neighborhood = new LinkedList<Integer>(); 
-    //public LinkedList<Integer> n2_neighborhood = new LinkedList<Integer>();
-    public LinkedList<Double>  link_capacity = new LinkedList<Double>();
+    public ArrayList<Node> n1_neighborhood = new ArrayList<Node>(); 
+    public ArrayList<Node> n2_neighborhood = new ArrayList<Node>();
+    public ArrayList<Double>  link_capacity = new ArrayList<Double>();
     public double time_slot=1.0, capacity=0;
     public pathToDestination ptD;
     // When node is from Datasets
@@ -76,7 +76,7 @@ public void clearNodeSettings()
 	y_coord.clear();
 	nodePackets.clear();
 	prob_coord.clear();
-	node_nm.InitialNodePositions(this);
+	nodePosition();
 	msg_latency= msg_hops = msg_dl= msg_relibility =0;
 	time_slot=1.0;
 	capacity=0; 
